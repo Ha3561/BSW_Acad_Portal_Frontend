@@ -13,7 +13,7 @@ function App() {
     <Routes>
        <Route path='/'>
          
-         <Route index element={<ModDashboard/>}/>
+         <Route index element={<MentorDashboard/>}/>
          <Route path='mark-Attendance' element={<MarkAttnd/>}/>
          <Route path='float-Oppurtunity' element={<FloatOpp/>}/>
        </Route>

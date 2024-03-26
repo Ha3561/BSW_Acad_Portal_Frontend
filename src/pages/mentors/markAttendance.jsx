@@ -4,6 +4,7 @@ import { DatePicker, LocalizationProvider } from '@mui/x-date-pickers';
 import {AdapterDateFns} from '@mui/x-date-pickers/AdapterDateFns';
 import CloudUploadIcon from '@mui/icons-material/CloudUpload';
 import { styled } from '@mui/system';
+import { PhotoAlbumOutlined } from '@mui/icons-material';
 
 const StyledButton = styled(Button)(({ theme }) => ({
   marginTop: theme.spacing(2),
@@ -12,7 +13,7 @@ const StyledButton = styled(Button)(({ theme }) => ({
 const MarkAttnd = () => {
   const [sessionDate, setSessionDate] = useState(null);
   const [discussion, setDiscussion] = useState('');
-  const [photo, setPhoto] = useState(null);
+  const [photos, setPhoto] = useState([]);
 
   const handleDateChange = (date) => {
     setSessionDate(date);
@@ -23,21 +24,51 @@ const MarkAttnd = () => {
   };
 
   const handlePhotoChange = (event) => {
-    const file = event.target.files[0];
-    setPhoto(file);
+    const files = event.target.files;
+    setPhoto([...photos,...files]);
   };
 
   const handleSubmit = (event) => {
     event.preventDefault();
-    // Add form submission logic here
-    console.log({ sessionDate, discussion, photo });
+    const formData = new FormData();
+formData.append('date', sessionDate);
+formData.append('description', discussion);
+photos.forEach((photo, index) => {
+  formData.append(`images`, photo);
+});
+    fetch('http://localhost:3001/api/mentor/attendance/post', {
+      method: 'POST',
+     
+      body: formData,
+    })
+      .then((response) => {
+        if (response.ok) {
+          // Handle successful response here
+          return response.json(); // Parse the JSON response
+        } else {
+          // Handle error response
+          return response.json().then(errorData => {
+            throw new Error(`${errorData.msg}`);
+          });
+        }
+      })
+      .then((responseData) => {
+        setPhoto([])
+        console.log(responseData)
+
+      })
+      .catch((error) => {
+        setPhoto([])
+       console.log(error)
+      });
+    
   };
 
   return (
-    <Box height="500px" display="flex" justifyContent="center" alignItems="center">
+    <Box  display="flex" justifyContent="center" alignItems="center" width={"100%"}>
     <LocalizationProvider dateAdapter={AdapterDateFns}>
     <Paper elevation={3} sx={{ padding: 3 }}>
-      <form onSubmit={handleSubmit}>
+      <form onSubmit={handleSubmit} encType="multipart/form-data">
         <Grid container spacing={2} justifyContent="center">
           <Grid item xs={12}>
             <Typography variant="h4" align="center" gutterBottom>
@@ -69,6 +100,7 @@ const MarkAttnd = () => {
               type="file"
               onChange={handlePhotoChange}
               style={{ display: 'none' }}
+              multiple
             />
             <label htmlFor="photo-upload">
               <StyledButton
@@ -76,10 +108,17 @@ const MarkAttnd = () => {
                 component="span"
                 startIcon={<CloudUploadIcon />}
               >
-                Upload Photo of session
+                Add photo
               </StyledButton>
             </label>
           </Grid>
+         
+          <Grid item xs={12}>
+                {/* Display selected images */}
+                {photos.map((photo, index) => (
+                  <img key={index} src={URL.createObjectURL(photo)} alt={`image-${index}`} style={{ width: '50px', height: '50px', marginRight: '10px' }} />
+                ))}
+              </Grid>
           <Grid item xs={12}>
             <Button type="submit" variant="contained" color="primary" >
               Submit
