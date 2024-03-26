@@ -1,24 +1,24 @@
 import logo from './logo.svg';
 import './App.css';
-
+import React from 'react';
+import { Route, Routes,Navigate, BrowserRouter } from "react-router-dom";
+import StudentDashboard from './pages/students/studentDashboard';
+import MentorDashboard from './pages/mentors/mentorDashboard';
+import MarkAttnd from './pages/mentors/markAttendance';
+import FloatOpp from './pages/mentors/floatOppurtunity';
+import ModDashboard from './pages/mod/modDashboard';
 function App() {
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
+    <BrowserRouter>
+    <Routes>
+       <Route path='/'>
+         
+         <Route index element={<ModDashboard/>}/>
+         <Route path='mark-Attendance' element={<MarkAttnd/>}/>
+         <Route path='float-Oppurtunity' element={<FloatOpp/>}/>
+       </Route>
+    </Routes>
+    </BrowserRouter>
   );
 }
 
