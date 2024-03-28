@@ -60,7 +60,7 @@ const FloatOpp = () => {
   return (
     <Box  display="flex" justifyContent="center" alignItems="center" width={"100%"}>
     <LocalizationProvider dateAdapter={AdapterDateFns}>
-      <Paper elevation={3} sx={{ padding: 3 }}>
+      <Paper elevation={3} sx={{ padding: 3,width:"100%" }}>
         <Typography variant="h4" align="center" gutterBottom>
         Float Opportunity
         </Typography>

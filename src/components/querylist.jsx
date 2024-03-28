@@ -21,11 +21,12 @@ import Switch from '@mui/material/Switch';
 import DeleteIcon from '@mui/icons-material/Delete';
 import FilterListIcon from '@mui/icons-material/FilterList';
 import { visuallyHidden } from '@mui/utils';
-import { Button, Collapse, TextField } from '@mui/material';
+import { Button, Card, CardActionArea, CardMedia, Collapse, Dialog, DialogActions, Grid, TextField } from '@mui/material';
 import { useState } from 'react';
 import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
 import KeyboardArrowUpIcon from '@mui/icons-material/KeyboardArrowUp';
 import EditIcon from '@mui/icons-material/Edit';
+import RemoveRedEyeIcon from '@mui/icons-material/RemoveRedEye';
 function createData(id, name, calories, fat, carbs, protein) {
   return {
     id,
@@ -212,11 +213,12 @@ EnhancedTableToolbar.propTypes = {
 };
 
 
-function Row(row, isItemSelected, labelId,mode) {
+function Row(row, isItemSelected, labelId, mode, openDialog) {
   const [open, setOpen] = useState(false)
   return (
 
     <React.Fragment>
+
 
 
       <TableRow
@@ -225,7 +227,7 @@ function Row(row, isItemSelected, labelId,mode) {
         role="checkbox"
         aria-checked={isItemSelected}
         tabIndex={-1}
-        key={row.id}
+        key={row._id}
         selected={isItemSelected}
         sx={{ cursor: 'pointer' }}
       >
@@ -244,12 +246,12 @@ function Row(row, isItemSelected, labelId,mode) {
           scope="row"
           padding="none"
         >
-          {row.name}
+          {row.student}
         </TableCell>
-        <TableCell align="right">{row.calories}</TableCell>
-        <TableCell align="right">{row.fat}</TableCell>
-        <TableCell align="right">{row.carbs}</TableCell>
-        <TableCell align="right">{row.protein}</TableCell>
+        <TableCell align="right">{row.status}</TableCell>
+        <TableCell align="right">{row.mentor}</TableCell>
+        <TableCell align="right">{row.raised_at}</TableCell>
+        <TableCell align="right">{row.type}</TableCell>
       </TableRow>
       <TableRow>
         <TableCell style={{ paddingBottom: 0, paddingTop: 0 }} colSpan={6}>
@@ -258,34 +260,63 @@ function Row(row, isItemSelected, labelId,mode) {
               <Typography variant="h6" gutterBottom component="div">
                 Info
               </Typography>
-              {
-               ( mode==="mentor" && row.calories==="TAKEN") &&  <Typography variant="h6" gutterBottom component="div">
-               Student Details
-             </Typography>
-              }
-             
-              <div className="" style={{display:"flex",gap:"20px",marginBottom:"10px"}}>
-               { ( mode==="moderator" && row.calories==="RESOLVED") &&<TextField id="outlined-basic" label="Hours" variant="outlined" size='small'/>}
-                </div>
-              <div className="actions" style={{display:"flex",gap:"20px"}}>
-                {( mode==="moderator" && row.calories==="QUEUED") && <Button variant="contained" size='small'>Approve</Button>}
-                {( mode==="moderator" && row.calories==="RESOLVED") && <Button variant="contained" size='small'>Approve hrs</Button>}
-                {( mode==="moderator" && row.calories==="REJECTED") && <Button variant="outlined" size='small'>Approve instead</Button>}
-                {( mode==="moderator" && row.calories==="APPROVED") && <Button variant="outlined" size='small'>Reject instead</Button>}
-                {( mode==="mentor" && row.calories==="AVAILABLE") && <Button variant="outlined" size='small'>Take up</Button>}
-                {( mode==="moderator" && row.calories==="QUEUED") &&<Button variant="contained" style={{backgroundColor:"red"}} size='small'>Reject</Button>}
-                {( mode==="moderator" && row.calories==="RESOLVED") &&<Button variant="contained" style={{backgroundColor:"red"}} size='small'>Reject hrs</Button>}
 
-                {( mode==="student" && row.calories==="QUEUED") && <Button variant="contained" size='small' startIcon={<EditIcon/>}>Edit</Button>}
-                {( mode==="student" && row.calories==="TAKEN") && <Button variant="contained" size='small' startIcon={<EditIcon/>}>Resolved</Button>}
-               { ( mode==="mentor" && row.calories==="AVAILABLE")  &&<Button variant="contained" size='small' >Take up</Button>}
-                {( mode==="student" && row.calories==="QUEUED") &&  <Button variant="contained" style={{backgroundColor:"red"}} size='small' startIcon={<DeleteIcon/>}>Delete</Button>}
+              {row.feedback && <Typography variant="subtitle1" gutterBottom component="div">
+                <strong>Feedback:</strong>  {"New Feedback"}
+              </Typography>}
+              <Typography variant="subtitle1" gutterBottom component="div">
+                <strong>Description:</strong>  {"Description"}
+              </Typography>
+              {row.attachments.length != 0 &&
+                <React.Fragment>
+
+                  <Box position="relative" display="inline-block">
+                    <IconButton
+                      aria-label="View attachment"
+                      onClick={() => { openDialog() }}
+                      style={{ position: 'absolute', left: '50%', transform: 'translateX(-50%)', zIndex: 1 }}
+                    >
+                      <RemoveRedEyeIcon />
+                    </IconButton>
+                    {/* Display the image with a backdrop effect */}
+                    <img
+                      src={row.attachments[0]}
+                      alt="Attachment"
+                      style={{ width: '50px', height: '50px', zIndex: 0, objectFit: "cover" }}
+                    />
+                  </Box>
+                </React.Fragment>
+              }
+
+
+              {
+                (mode === "mentor" && row.status === "TAKEN") && <Typography variant="h6" gutterBottom component="div">
+                  Student Details
+                </Typography>
+              }
+
+              <div className="" style={{ display: "flex", gap: "20px", marginBottom: "10px" }}>
+                {(mode === "moderator" && row.status === "RESOLVED") && <TextField id="outlined-basic" label="Hours" variant="outlined" size='small' />}
+              </div>
+              <div className="actions" style={{ display: "flex", gap: "20px" }}>
+                {(mode === "moderator" && row.status === "QUEUED") && <Button variant="contained" size='small'>Approve</Button>}
+                {(mode === "moderator" && row.status === "RESOLVED") && <Button variant="contained" size='small'>Approve hrs</Button>}
+                {(mode === "moderator" && row.status === "REJECTED") && <Button variant="outlined" size='small'>Approve instead</Button>}
+                {(mode === "moderator" && row.status === "APPROVED") && <Button variant="outlined" size='small'>Reject instead</Button>}
+                {(mode === "mentor" && row.status === "AVAILABLE") && <Button variant="outlined" size='small'>Take up</Button>}
+                {(mode === "moderator" && row.status === "QUEUED") && <Button variant="contained" style={{ backgroundColor: "red" }} size='small'>Reject</Button>}
+                {(mode === "moderator" && row.status === "RESOLVED") && <Button variant="contained" style={{ backgroundColor: "red" }} size='small'>Reject hrs</Button>}
+
+                {(mode === "student" && row.status === "QUEUED") && <Button variant="contained" size='small' startIcon={<EditIcon />}>Edit</Button>}
+                {(mode === "student" && row.status === "TAKEN") && <Button variant="contained" size='small' startIcon={<EditIcon />}>Resolved</Button>}
+                {(mode === "mentor" && row.status === "AVAILABLE") && <Button variant="contained" size='small' >Take up</Button>}
+                {(mode === "student" && row.status === "QUEUED") && <Button variant="contained" style={{ backgroundColor: "red" }} size='small' startIcon={<DeleteIcon />}>Delete</Button>}
 
                 {
-                  
+
                 }
-                </div>
-                
+              </div>
+
             </Box>
           </Collapse>
         </TableCell>
@@ -293,14 +324,14 @@ function Row(row, isItemSelected, labelId,mode) {
     </React.Fragment>
   )
 }
-export default function Querylist({mode}) {
+export default function Querylist({ mode, data }) {
   const [order, setOrder] = React.useState('asc');
   const [orderBy, setOrderBy] = React.useState('calories');
   const [selected, setSelected] = React.useState([]);
   const [page, setPage] = React.useState(0);
   const [dense, setDense] = React.useState(false);
   const [rowsPerPage, setRowsPerPage] = React.useState(5);
-
+  const [open, setOpen] = useState(false)
 
   const handleChangePage = (event, newPage) => {
     setPage(newPage);
@@ -311,7 +342,64 @@ export default function Querylist({mode}) {
     setPage(0);
   };
 
+  const rejectQuery = (id) => {
+    fetch('http://localhost:3001/api/moderator/queries/dismiss/:id', {
+      method: 'POST',
 
+      body: JSON.stringify({
+        kerberos: ""
+      }),
+    })
+      .then((response) => {
+        if (response.ok) {
+          // Handle successful response here
+          return response.json(); // Parse the JSON response
+        } else {
+          // Handle error response
+          return response.json().then(errorData => {
+            throw new Error(`${errorData.msg}`);
+          });
+        }
+      })
+      .then((responseData) => {
+
+        console.log(responseData)
+
+      })
+      .catch((error) => {
+
+        console.log(error)
+      });
+  }
+  const deleteQuery = (id) => {
+    fetch('http://localhost:3001/api/student/delete/' + id, {
+      method: 'POST',
+
+      body: JSON.stringify({
+        kerberos: ""
+      }),
+    })
+      .then((response) => {
+        if (response.ok) {
+          // Handle successful response here
+          return response.json(); // Parse the JSON response
+        } else {
+          // Handle error response
+          return response.json().then(errorData => {
+            throw new Error(`${errorData.msg}`);
+          });
+        }
+      })
+      .then((responseData) => {
+
+        console.log(responseData)
+
+      })
+      .catch((error) => {
+
+        console.log(error)
+      });
+  }
 
   const isSelected = (id) => selected.indexOf(id) !== -1;
 
@@ -321,17 +409,57 @@ export default function Querylist({mode}) {
 
   const visibleRows = React.useMemo(
     () =>
-      stableSort(rows, getComparator(order, orderBy)).slice(
+      data.slice(
         page * rowsPerPage,
         page * rowsPerPage + rowsPerPage,
       ),
-    [order, orderBy, page, rowsPerPage],
+    [page, rowsPerPage],
   );
+  const imageUrls = [
+    "https://placehold.co/600x400",
+    "https://placehold.co/600x400",
+    "https://placehold.co/600x400",
+    "https://placehold.co/600x400",
+    "https://placehold.co/600x400",
+    "https://placehold.co/600x400",
+    "https://placehold.co/600x400",
+    "https://placehold.co/600x400",
 
+  ]
 
   return (
     <Box display="flex" justifyContent="center" alignItems="center" flexDirection={"column"} >
-      <Paper sx={{ width: '90%',  }}>
+      <Dialog
+        open={open}
+        onClose={() => { setOpen(false) }}
+        aria-labelledby="alert-dialog-title"
+        aria-describedby="alert-dialog-description"
+      >
+        <Grid container spacing={2}>
+          {imageUrls.map((imageUrl, index) => (
+            <Grid item xs={12} sm={6} md={4} lg={3} key={index}>
+              <Card>
+                <CardActionArea>
+                  <CardMedia
+                    component="img"
+                    height="200"
+                    style={{ objectFit: 'cover' }}
+                    image={imageUrl}
+                    alt={`Image ${index}`}
+                  />
+                </CardActionArea>
+              </Card>
+            </Grid>
+          ))}
+        </Grid>
+        <DialogActions>
+
+          <Button onClick={() => { setOpen(false) }} autoFocus>
+            Close
+          </Button>
+        </DialogActions>
+      </Dialog>
+      <Paper sx={{ width: '90%', }}>
         <EnhancedTableToolbar numSelected={selected.length} />
         <TableContainer>
           <Table
@@ -353,7 +481,7 @@ export default function Querylist({mode}) {
                 const labelId = `enhanced-table-checkbox-${index}`;
 
                 return (
-                  Row(row, isItemSelected, labelId,mode)
+                  Row(row, isItemSelected, labelId, mode, () => { setOpen(true) })
                 );
               })}
               {emptyRows > 0 && (
@@ -371,7 +499,7 @@ export default function Querylist({mode}) {
         <TablePagination
           rowsPerPageOptions={[5, 10, 25]}
           component="div"
-          count={rows.length}
+          count={data.length}
           rowsPerPage={rowsPerPage}
           page={page}
           onPageChange={handleChangePage}

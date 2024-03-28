@@ -63,11 +63,10 @@ photos.forEach((photo, index) => {
       });
     
   };
-
   return (
-    <Box  display="flex" justifyContent="center" alignItems="center" width={"100%"}>
+    <Box  display="flex" justifyContent="center"  width={"100vw"} >
     <LocalizationProvider dateAdapter={AdapterDateFns}>
-    <Paper elevation={3} sx={{ padding: 3 }}>
+    <Paper elevation={3} sx={{ padding: 3,width:"100%", }} >
       <form onSubmit={handleSubmit} encType="multipart/form-data">
         <Grid container spacing={2} justifyContent="center">
           <Grid item xs={12}>

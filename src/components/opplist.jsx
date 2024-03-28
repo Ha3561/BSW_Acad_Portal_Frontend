@@ -88,16 +88,22 @@ function stableSort(array, comparator) {
 
 const headCells = [
   {
-    id: 'mentor',
-    numeric: false,
+    id: 'title',
+    numeric: true,
     disablePadding: true,
-    label: 'Mentor',
+    label: 'Title',
+  },
+  {
+    id: 'creator',
+    numeric: false,
+    disablePadding: false,
+    label: 'Creator',
   },
   {
     id: 'date',
     numeric: true,
     disablePadding: false,
-    label: 'Date',
+    label: 'Start Date',
   },
   {
     id: 'status',
@@ -109,14 +115,9 @@ const headCells = [
     id: 'raisedat',
     numeric: true,
     disablePadding: false,
-    label: 'Raised At',
+    label: 'End Date',
   },
-  {
-    id: 'type',
-    numeric: true,
-    disablePadding: false,
-    label: 'Type',
-  },
+  
 ];
 
 function EnhancedTableHead(props) {
@@ -226,7 +227,7 @@ function Row(row, isItemSelected, labelId,mode) {
         role="checkbox"
         aria-checked={isItemSelected}
         tabIndex={-1}
-        key={row.id}
+        key={row._id}
         selected={isItemSelected}
         sx={{ cursor: 'pointer' }}
       >
@@ -245,12 +246,13 @@ function Row(row, isItemSelected, labelId,mode) {
           scope="row"
           padding="none"
         >
-          {row.name}
+          {row.title}
         </TableCell>
-        <TableCell align="right">{row.calories}</TableCell>
-        <TableCell align="right">{row.fat}</TableCell>
-        <TableCell align="right">{row.carbs}</TableCell>
-        <TableCell align="right">{row.protein}</TableCell>
+        <TableCell align="right">{row.creator}</TableCell>
+        <TableCell align="right">{row.start}</TableCell>
+        <TableCell align="right">{row.state}</TableCell>
+        <TableCell align="right">{row.end}</TableCell>
+        
       </TableRow>
       <TableRow>
         <TableCell style={{ paddingBottom: 0, paddingTop: 0 }} colSpan={6}>
@@ -259,16 +261,16 @@ function Row(row, isItemSelected, labelId,mode) {
               <Typography variant="h6" gutterBottom component="div">
                 Info
               </Typography>
-              { ( mode==="mentor" && row.fat==="TAKEN") && <Typography variant="h6" gutterBottom component="div">
+              { ( mode==="mentor" && row.state==="TAKEN") && <Typography variant="h6" gutterBottom component="div">
                 Mentor's Details
               </Typography>}
               {/* <div className="" style={{display:"flex",gap:"20px",marginBottom:"10px"}}>
                 <TextField id="outlined-basic" label="Hours" variant="outlined" size='small'/>
                 </div> */}
               <div className="actions" style={{display:"flex",gap:"20px"}}>
-                {( mode==="mentor" && row.fat==="AVAILABLE") && <Button variant="contained" size='small' startIcon={<EditIcon/>}>Edit</Button>}
-               { ( mode==="mentor" && row.fat==="AVAILABLE")  &&<Button variant="contained" size='small' >Take up</Button>}
-                {( mode==="mentor" && row.fat==="AVAILABLE") &&  <Button variant="contained" style={{backgroundColor:"red"}} size='small' startIcon={<DeleteIcon/>}>Delete</Button>}
+                {( mode==="mentor" && row.state==="AVAILABLE") && <Button variant="contained" size='small' startIcon={<EditIcon/>}>Edit</Button>}
+               { ( mode==="mentor" && row.state==="AVAILABLE")  &&<Button variant="contained" size='small' >Take up</Button>}
+                {( mode==="mentor" && row.state==="AVAILABLE") &&  <Button variant="contained" style={{backgroundColor:"red"}} size='small' startIcon={<DeleteIcon/>}>Delete</Button>}
                 </div>
                 
             </Box>
@@ -278,7 +280,7 @@ function Row(row, isItemSelected, labelId,mode) {
     </React.Fragment>
   )
 }
-export default function Oppurtunitylist({mode}) {
+export default function Oppurtunitylist({mode,data}) {
   const [order, setOrder] = React.useState('asc');
   const [orderBy, setOrderBy] = React.useState('calories');
   const [selected, setSelected] = React.useState([]);
@@ -306,11 +308,11 @@ export default function Oppurtunitylist({mode}) {
 
   const visibleRows = React.useMemo(
     () =>
-      stableSort(rows, getComparator(order, orderBy)).slice(
+      data.slice(
         page * rowsPerPage,
         page * rowsPerPage + rowsPerPage,
       ),
-    [order, orderBy, page, rowsPerPage],
+    [page, rowsPerPage],
   );
 
 
@@ -356,7 +358,7 @@ export default function Oppurtunitylist({mode}) {
         <TablePagination
           rowsPerPageOptions={[5, 10, 25]}
           component="div"
-          count={rows.length}
+          count={data.length}
           rowsPerPage={rowsPerPage}
           page={page}
           onPageChange={handleChangePage}
